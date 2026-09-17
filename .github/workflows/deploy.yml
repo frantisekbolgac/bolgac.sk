@@ -1,0 +1,48 @@
+name: Deploy
+
+# UDALOSŤ, NIE ROZVRH: CI reaguje na zmenu stavu repa.
+# Git je zdroj pravdy; push je signál, že sa pravda zmenila.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    # EFEMÉRNE PROSTREDIE: čerstvá VM, po dobehnutí sa zahodí.
+    # Dôsledok: build nemôže závisieť na ničom, čo nie je v repe.
+    # Ak ti to ide lokálne a na CI nie, máš skrytú závislosť na svojom stroji.
+    runs-on: ubuntu-latest
+
+    # Kroky sú reťaz — každý predpokladá výsledok predchádzajúceho.
+    steps:
+      # 1. PRINES KÓD. Runner nabehne prázdny, o repe nevie nič,
+      #    hoci tento súbor je v ňom. Bez checkoutu neexistuje package.json.
+      - uses: actions/checkout@v4
+
+      # 2. PRIPRAV PROSTREDIE. Verziu pripíname z rovnakého dôvodu
+      #    ako compatibility_date — reprodukovateľnosť.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm   # cache kľúčovaná hashom package-lock.json
+
+      # 3. ZÁVISLOSTI. "ci" nie "install" — inštaluje presne podľa
+      #    lockfilu a zlyhá pri nezhode. install by ticho upgradol
+      #    a build by bol iný než tvoj lokálny.
+      #    node_modules je artefakt, preto sa neverzuje, ale rekonštruuje.
+      - run: npm ci
+
+      # 4. BUILD. Zdroj (.md, .astro) → artefakt (HTML/CSS/JS v dist/).
+      #    dist/ je v .gitignore: čo vieš reprodukovať, to neskladuješ.
+      - run: npm run build
+
+      # 5. DEPLOY. Cieľ nie je tu — je vo wrangler.jsonc.
+      #    YAML dodáva len credentials; čo a kam sa posiela, vie wrangler.
+      #    Oddelenie: CI vie "kedy", konfigurák vie "čo".
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          # Token nikdy priamo v súbore — ten je v Gite a Git je navždy.
+          # Scope: Workers Scripts Edit. Únik = prepísaný worker,
+          # nie stratená doména či mailbox. Blast radius sa reže vopred.
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

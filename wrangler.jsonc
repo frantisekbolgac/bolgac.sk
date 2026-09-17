@@ -1,0 +1,29 @@
+{
+  // IDENTITA: podľa mena wrangler rozhodne, či zakladá nový worker
+  // alebo prepisuje existujúci. Meno = adresa v CF účte.
+  // Zmena mena nevytvorí premenovanie, ale druhý worker vedľa starého.
+  "name": "bolgac-sk",
+
+  // ZMRAZENIE PLATFORMY: CF garantuje, že runtime sa voči tomuto dátumu
+  // nezmení. Bez toho by ti ich budúci upgrade mohol rozbiť fungujúci web.
+  // Princíp: závislosť na cudzej platforme si pripneš, nenecháš plávať.
+  "compatibility_date": "2026-09-16",
+
+  "assets": {
+    // HRANICA BUILD ↔ DEPLOY: jediné, čo tieto dve fázy spája.
+    // Astro sem zapíše, wrangler odtiaľto číta. Ani jeden o druhom nevie.
+    // Preto ich vieš spustiť oddelene, na iných strojoch, v inom čase.
+    "directory": "./dist",
+
+    // Fallback pre neexistujúce URL. Hľadá dist/404.html.
+    // "single-page-application" by vracalo index.html na všetko —
+    // to je pre client-side routing (React), nie pre Astro,
+    // kde má každá stránka vlastný HTML súbor.
+    "not_found_handling": "404-page"
+  }
+
+  // ČO TU ZÁMERNE NIE JE: doména.
+  // Deploy a routing sú oddelené vrstvy — worker vieš nasadiť
+  // a testovať na *.workers.dev skôr, než naň pustíš ostrú doménu.
+  // Rovnaká logika ako blue-green: nové nasadenie ≠ nová prevádzka.
+}

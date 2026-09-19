@@ -24,6 +24,8 @@ Obsidian (.md) → git push → GitHub Actions (build + validácia) → Cloudfla
 
 Zvažoval som Quartz aj niekoľko Astro tém (Chirping, Fuwari, AstroPaper). Každá bola buď príliš ťažká, alebo cudzia — kód, ktorému nerozumiem, je kód, ktorý neviem opraviť. Tak som si šablónu napísal sám: sidebar, navy paleta, light/dark režim, nula závislostí nad rámec Astra.
 
+Priznanie: šablónu som **vibe-codil** s AI asistentom. Infraštruktúru (Git, DNS, pipeline) som si staval rukami a rozumiem každému kroku — pri šablóne som AI nechal generovať a ja som revidoval, pýtal sa na princípy a rozhodoval o looku. Výsledok je kód, ktorému rozumiem, len cesta k nemu bola rýchlejšia.
+
 Výhoda vlastnej šablóny: presne viem, čo sa pri builde stane s každým riadkom. Nevýhoda: všetko si musím postaviť sám. Pre blog je to pár večerov — prijateľná cena za porozumenie.
 
 ## Čo bude ďalej

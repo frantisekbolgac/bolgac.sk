@@ -28,6 +28,20 @@ Priznanie: šablónu som **vibe-codil** s AI asistentom. Infraštruktúru (Git, 
 
 Výhoda vlastnej šablóny: presne viem, čo sa pri builde stane s každým riadkom. Nevýhoda: všetko si musím postaviť sám. Pre blog je to pár večerov — prijateľná cena za porozumenie.
 
+## Z čoho je to postavené
+
+Päť stavebných blokov, každý s jednou úlohou:
+
+**1. OpenCode** — open-source coding harness bežiaci v termináli. Držal kontext projektu, editoval súbory, púšťal buildy a git operácie. Ja som zadával smer a revidoval výsledky — AI písalo, človek rozhodoval.
+
+**2. Muse Spark 1.3** — jazykový model pripojený do OpenCode. Na základe mojich požiadaviek (konzervatívny look, sidebar, navy paleta, light/dark) spolu vygenerovali tému pre Astro 7. Infraštruktúru som si robil sám, šablóna je vibe-coding.
+
+**3. Astro + Node lokálne** — Node 22 a `astro dev` server s hot-reloadom na porte 8002. Tu sa ladil vzhľad a kontrolovala responzivita skôr, než čokoľvek odišlo von. Build trvá pod dve sekundy, takže cyklus nápad → náhľad je okamžitý.
+
+**4. GitHub** — úložisko zdrojákov a CI v jednom. Každý push do `main` spustí GitHub Actions: čistá inštalácia (`npm ci`), `astro build` vrátane validácie frontmatteru a deploy. Zlý frontmatter = červený build = nič sa nepublikuje.
+
+**5. Cloudflare Workers** — "úložisko aj webserver" v jednom. Hotová statika (`dist/`) sa nasadí ako assets-only worker a servuje sa z edge po celom svete. DNS, TLS certifikát a CDN sú vedľajší produkt toho istého účtu, kde mám aj doménu.
+
 ## Čo bude ďalej
 
 RSS a sitemap, vlastná doména namiesto `workers.dev`, vyhľadávanie cez Pagefind a napojenie Obsidianu tak, aby články putovali do repa bez ručného kopírovania. O každom kroku napíšem sem.

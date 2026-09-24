@@ -4,7 +4,7 @@ name: Deploy
 # Git je zdroj pravdy; push je signál, že sa pravda zmenila.
 on:
   push:
-    branches: [main]
+    branches: [staging]
 
 jobs:
   deploy:

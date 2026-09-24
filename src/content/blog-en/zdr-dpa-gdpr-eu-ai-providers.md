@@ -27,11 +27,13 @@ Included in the main matrix:
 
 The main matrix excludes end-user chat SaaS, GPU/IaaS-only offers, self-host-only products, US hyperscalers with an EU option, and narrowly specialized APIs. This is not a judgement that they are bad; it avoids comparing different products as if they were the same.
 
+Data classification determines the processing conditions, the technical and organisational measures required, and the scope of the assessment. It does not automatically mean that a provider may or may not be used. Special categories of personal data under Article 9 GDPR have their own legal framework and must be assessed separately; compliance with Article 6 alone does not cover them.
+
 ## Three layers that must not be confused
 
 ### ZDR is a technical property of a specific service
 
-ZDR means that **the content of a specific request and response is not stored after processing**. The scope must nevertheless be assessed endpoint by endpoint, including legal exceptions, safety retention and application state. It is not automatically a property of an entire provider brand.
+ZDR means that **the content of a specific request and response is not stored after processing**. Basic ZDR definitions are not enough for an audit: the scope must be assessed for each endpoint separately, including legal exceptions, safety retention and application state. A shared platform baseline does not prove an identical scope for every product, because partner, regional, batch, stateful or on-request modes may have different terms. It is not automatically a property of an entire provider brand.
 
 I do not treat the following as ZDR:
 
@@ -43,9 +45,9 @@ I do not treat the following as ZDR:
 
 ### DPA is the contractual layer
 
-A DPA is an agreement between the controller and processor under Article 28 of the GDPR. In this audit, I treat it as evidence that a contractual framework exists that can be accepted and incorporated into the service contract.
+A DPA is an agreement under Article 28 of the GDPR, typically between the controller and the processor. In this audit, I treat it as evidence that a contractual framework exists that can be accepted and incorporated into the service contract.
 
-A DPA does not by itself make the customer's use of the service compliant with the GDPR. The controller remains responsible for the legal basis, processing purpose and DPIA; the processor assists and has its own obligations under Articles 28 and 32.
+A DPA does not by itself make the customer's use of the service compliant with the GDPR. The controller remains responsible for the legal basis, processing purpose and DPIA, where required under Article 35; the processor assists and has its own obligations under Articles 28 and 32.
 
 ### GDPR evidence is not a marketing sentence
 
@@ -61,20 +63,20 @@ Without verifiable evidence, "ZDR" is only a claim.
 
 ## Audit results
 
-The table includes the verified DPA status where it can be supported. `PASS` means **documented ZDR according to the provider's public documentation**, not independent verification of the customer's deployment.
+The table includes the verified DPA status where it can be supported. `Documented` means there is explicit evidence in the provider's public documentation; it is not independent verification of the customer's deployment or a legal certification. `Documented after approval or enablement` requires an additional customer-side step. `Does not meet the strict criterion` means that a documented exception or retention period falls outside the ZDR defined in this table. `Unverified` means that the cited public source did not confirm the point.
 
-| Provider | Processing and storage | ZDR verdict | DPA and evidence | Scope and exceptions |
+| Provider | Inference and storage location | ZDR verdict | DPA and evidence | Scope and exceptions |
 |---|---|---|---|---|
-| **OVHcloud / OVH SAS** | Gravelines, France | **PASS for synchronous AI Endpoints** | Public DPA and documentation | Batch and Files use stored input and output files with their own retention and are outside strict ZDR. |
-| **STACKIT / Schwarz Digits Cloud** | EU01, Germany South | **PASS** | Public DPA and Service Certificate | Documentation says data and queries are neither stored nor used for training. |
-| **IONOS Cloud / IONOS SE** | German data centres; stateless Model Hub | **PASS for stateless Model Hub** | DPA incorporated into the terms; public documentation | Prompts and outputs are not written to persistent storage; operational metadata remains. The documentation refers to the end of a `session`, not exactly to the end of a `request`. |
-| **Scaleway SAS** | Paris, France | **FAIL strict ZDR** | Public DPA and Generative APIs Privacy Policy | It is close to ZDR in normal operation, but HTTP requests may remain for up to two weeks after reliability-impacting errors or suspected misuse; anonymous metadata may be retained for up to six months. |
-| **Nebius Token Factory / Nebius B.V.** | EU models in Finland/France, or a dedicated EU endpoint | **PASS only when enabled** | Public DPA | Prompts and outputs are stored by default for speculative decoding. ZDR disables that storage; verify regional processing for the specific model or dedicated endpoint. |
-| **Mistral AI** | `api.eu.mistral.ai`; EU and EFTA | **PASS after approval** | DPA available in the Data Processing Addendum | Only for eligible organizations on the paid Scale plan and supported stateless APIs. It does not cover Agents, Batch, Conversations, Libraries, Files, Vibe Work or Labs models. |
-| **OpenAI API / OpenAI Ireland Ltd.** | EU (EEA + Switzerland) via `eu.api.openai.com` | **PASS after approval** | DPA; approval and retention amendment | ZDR is documented for approved and supported endpoints and models. The specific endpoint and feature must be checked in the current ZDR table. |
-| **Anthropic / Anthropic Ireland Limited** | EU/EEA regional options through supported platforms | **PASS after approval** | ZDR is enabled per organisation; regional and contractual terms depend on the route | Fable 5, Fable 5.1, Mythos 5 and Mythos 5.1 have 30-day retention; ZDR is available only with express authorisation. EFS provides customer-controlled storage and is rolling out in phases. |
-| **xAI / xAI Corp** | Default global endpoint does not guarantee a region; a separate US endpoint exists | **PASS when enabled** | Public xAI DPA | ZDR is self-serve at team level. API requests and responses are retained for 30 days by default; ZDR disables that retention and blocks stateful Responses, Files, Collections, Batch, Deferred completions and stored image/video outputs. |
-| **Kimi / Moonshot AI PTE. LTD.** | The cited ZDR document does not specify a processing region | **PASS after approval** | DPA not verified in the cited sources | Enterprise ZDR on request: prompts and responses are deleted after the request and enterprise data is not used for training. Direct image/video uploads, third-party connectors and operational data are outside ZDR. |
+| **OVHcloud / OVH SAS** | Gravelines, France | **Documented for synchronous AI Endpoints** | [Public DPA](https://us.ovhcloud.com/legal/data-processing-agreement) and public documentation | Batch and Files use stored input and output files with their own retention and are outside strict ZDR. |
+| **STACKIT / Schwarz Digits Cloud** | EU01, Germany South | **Documented** | [Public DPA](https://stackit.com/en/asset/download/34534/file/STACKIT_data_processing_agreement.pdf?version=12) and Service Certificate | Documentation says data and queries are neither stored nor used for training. |
+| **IONOS Cloud / IONOS SE** | German data centres; stateless Model Hub | **Documented for stateless Model Hub** | [DPA](https://www.ionos.co.uk/terms-gtc/data-processing-agreement) and public documentation | Prompts and outputs are not written to persistent storage after the request according to the current documentation; operational metadata remains. |
+| **Scaleway SAS** | Paris, France | **Does not meet the strict criterion** | [Public DPA](https://www-uploads.scaleway.com/DPA_2024_ENG_b0abb5cc26.pdf) and Generative APIs Privacy Policy | It is close to ZDR in normal operation, but HTTP requests may remain for up to two weeks after reliability-impacting errors or suspected misuse; anonymous metadata may be retained for up to six months. |
+| **Nebius Token Factory / Nebius B.V.** | Public endpoints do not provide a general regional guarantee; a dedicated endpoint has a contractual region | **Documented after enablement** | [Public DPA](https://docs.tokenfactory.nebius.com/legal/dpa) and public documentation | Prompts and outputs are stored by default for speculative decoding. ZDR disables that storage; Finland in the storage context is not evidence of the inference location. |
+| **Mistral AI** | `api.eu.mistral.ai`; EU and EFTA; the control plane is not regional | **Documented after approval** | [DPA/ZDR](https://docs.mistral.ai/admin/monitor-comply/zero-data-retention) and regional [documentation](https://docs.mistral.ai/inference/regional-inference) | Applies to supported stateless APIs with `pay-as-you-go` and approval. It does not cover Labs models or stateful products such as Agents, Batch, Conversations, Libraries, Files and Vibe Work. |
+| **OpenAI API / OpenAI Ireland Ltd.** | **Europe (EEA + Switzerland)** via `eu.api.openai.com` | **Documented after approval** | [DPA](https://openai.com/policies/feb-2024-data-processing-addendum) and retention amendment | ZDR applies only to supported endpoints and models; system metadata and some features are outside ZDR. The specific endpoint and feature must be checked in the current ZDR table. |
+| **Anthropic / Anthropic Ireland Limited** | Direct Claude API: the cited documentation does not establish EU inference; a partner regional route is a separate product | **Documented after approval** | [DPA](https://www.anthropic.com/legal/data-processing-addendum) and regional [documentation](https://platform.claude.com/docs/en/manage-claude/data-residency) | Fable 5, Fable 5.1, Mythos 5 and Mythos 5.1 have 30-day retention. Flagged chat/session inputs and outputs may be retained for up to two years even under ZDR. EFS is a progressively available architecture. |
+| **xAI / xAI Corp** | The default global endpoint does not guarantee a region; a separate US endpoint exists | **Documented after enablement** | [Public xAI DPA](https://x.ai/legal/data-processing-addendum) | ZDR is self-serve at team level. API requests and responses are retained for 30 days by default; ZDR disables that retention and blocks stateful Responses, Files, Collections, Batch, Deferred completions and stored image/video outputs. |
+| **Kimi / Moonshot AI PTE. LTD.** | The cited ZDR document does not specify a processing region | **Documented after approval; limited scope** | DPA not verified in the cited sources | Enterprise ZDR on request: prompts and responses are deleted after the request and enterprise data is not used for training. Direct image/video uploads, third-party connectors and operational data are outside ZDR. |
 
 ## EU providers
 
@@ -94,15 +96,15 @@ This is not a provider ranking. It maps product profiles against the selected cr
 
 **OpenAI is a different case, but for customers who qualify it is significant.** ZDR is not only a retention setting. It is an eligibility condition that enables the use of frontier models without standard prompt and response retention on supported endpoints. OpenAI first reviews the customer's request and then approves a specific organisation or project setup.
 
-Under OpenAI's DPA, OpenAI Ireland Ltd. is the contracting party for customers domiciled in the EEA or Switzerland. This does not mean that all data is physically processed in Ireland. The EU region and ZDR must be assessed separately.
+Under OpenAI's DPA, OpenAI Ireland Ltd. is the contracting party for customers domiciled in the EEA or Switzerland. This does not mean that all data is physically processed in Ireland. OpenAI uses the exact name **Europe (EEA + Switzerland)**, not “EU region”. ZDR applies only to supported endpoints and models; system metadata, certain features and unsupported models or endpoints have their own rules. The specific model, endpoint and feature must always be checked against the current ZDR table.
 
 ### Anthropic
 
-**Anthropic** takes the opposite approach. Claude API ZDR is enabled per organisation through sales. It does not automatically extend to every new organisation. Fable 5, Fable 5.1, Mythos 5 and Mythos 5.1 have 30-day retention and are not available under ZDR unless Anthropic expressly authorises an exception.
+**Anthropic** takes the opposite approach. According to the cited documentation, direct Claude API `inference_geo` values are `global` or `us`; EU inference is therefore not established. Regional options through a supported partner are a separate route that must be assessed independently. Claude API ZDR is enabled per organisation through sales. It does not automatically extend to every new organisation. Fable 5, Fable 5.1, Mythos 5 and Mythos 5.1 have 30-day retention and are not available under ZDR unless Anthropic expressly authorises an exception.
 
-Anthropic therefore announced Enterprise Frontier Safeguards in September 2026. The customer stores monitoring data in its own cloud infrastructure, automated systems analyse risk and send signals to the customer, and Anthropic personnel do not access the underlying content. Until EFS is ready, eligible customers can use ZDR on Fable 5 and Fable 5.1. EFS is rolling out in phases, so this is a new, progressively available architecture rather than general ZDR across Anthropic.
+Anthropic therefore announced Enterprise Frontier Safeguards in September 2026. This is a proposed, progressively available architecture rather than general ZDR across Anthropic: the customer keeps monitoring data in its own infrastructure, automated systems send flags to its safety team, and Anthropic personnel do not access the content. Without EFS, eligible customers can use ZDR on Fable 5 and Fable 5.1.
 
-Anthropic also states that flagged inputs and outputs may be retained even under ZDR. This exception cannot be ignored.
+Anthropic also states that flagged chat or session inputs and outputs may be retained for up to two years even under ZDR. This exception cannot be ignored.
 
 ### xAI
 
@@ -112,10 +114,10 @@ Anthropic also states that flagged inputs and outputs may be retained even under
 
 Large Chinese models do not have one common answer:
 
-- **Kimi / Moonshot AI** publishes ZDR for enterprise customers on request and does not retain prompts or responses after the request. The documentation does not specify a processing region, and ZDR does not cover direct image/video uploads, third-party connectors or operational logs. It is strong ZDR, but not proof of EU sovereignty.
+- **Kimi / Moonshot AI** publishes ZDR for enterprise customers on request and does not retain prompts or responses after the request. The documentation does not specify a processing region, and ZDR does not cover direct image/video uploads, third-party connectors or operational logs. During this review, the cited source was checked against the available documentation but was not independently reloaded; the scope is therefore recorded as limited rather than as confirmed ZDR.
 - **DeepSeek** says in its public privacy policy that it processes data in China for its own services and may retain it while the account exists. The policy does not establish how customer data submitted through the API is handled. In this audit, its status is `unproven`, not a definitive FAIL. Disabling training use, where available, is not ZDR.
 - **Qwen through Alibaba Cloud Model Studio** says it does not use customer data for training and encrypts it with AES-256. The documentation also says that Model Studio stores data generated by model and application calls. A Frankfurt endpoint and processing of all operations in the EU require a separate source; without one, EU residency is unproven.
-- **MiniMax** I did not find sufficient official public evidence of a consistent ZDR, DPA and regional-processing posture. Missing evidence means the audit status is `unproven`, not PASS.
+- **MiniMax** I did not find sufficient official public evidence of a consistent ZDR, DPA and regional-processing posture. Missing evidence means the audit status is `unverified`, not confirmed ZDR.
 - **Open-weight models** can run on infrastructure you control or through a European inference provider. With self-hosting, the data path can be controlled architecturally only when operations, storage, logs and subprocessors are also controlled. A first-party Chinese API is a different service from a European host running the same model.
 
 This leads to an important distinction: **model origin and inference provider are not the same thing**. A large Chinese model can run in the EU with its own ZDR, while its direct API path may be in China without a suitable retention guarantee.
@@ -124,7 +126,7 @@ This leads to an important distinction: **model origin and inference provider ar
 
 Not as a setup guide, but as an order of decision-making:
 
-1. **Data.** First I distinguish data by type and sensitivity. Then I determine whether it is personal data or special categories of personal data under Article 9 GDPR. This determines whether the provider can be used at all.
+1. **Data.** First I distinguish data by type and sensitivity. Then I determine whether it is personal data or special categories of personal data under Article 9 GDPR. This determines the processing conditions, the required technical and organisational measures, and the boundaries to verify. Classification alone does not decide whether a provider can be used; the legal basis, contract and specific configuration also matter.
 2. **Boundary.** I decide where the data may go and where it must remain. Private or sensitive data that must not leave my encrypted disk does not go to an inference service just because the provider promises ZDR.
 3. **Endpoint.** I verify the specific endpoint, model and mode, not the brand. Stateless synchronous inference can have different properties from Batch, Files, Agents or stateful collections.
 4. **Contract.** I review the DPA, processor role, retention exceptions, subprocessors and other important terms before using production data.
@@ -157,10 +159,13 @@ Sources were verified on 24 September 2026. ZDR and regional options can change,
 - [Nebius — Data Processing Agreement](https://docs.tokenfactory.nebius.com/legal/dpa)
 - [Mistral — Zero Data Retention](https://docs.mistral.ai/admin/monitor-comply/zero-data-retention)
 - [Mistral — ZDR Help Center](https://help.mistral.ai/en/articles/347612-can-i-activate-zero-data-retention-zdr)
+- [Mistral — Regional inference](https://docs.mistral.ai/inference/regional-inference)
 - [OpenAI — Offering Zero Data Retention for frontier models](https://openai.com/index/offering-zero-data-retention-for-frontier-models/)
 - [OpenAI — Data controls in the OpenAI platform](https://developers.openai.com/api/docs/guides/your-data)
 - [OpenAI — Introducing data residency in Europe](https://openai.com/index/introducing-data-residency-in-europe/)
+- [OpenAI — Data Processing Addendum](https://openai.com/policies/feb-2024-data-processing-addendum)
 - [Anthropic — API and data retention](https://platform.claude.com/docs/en/manage-claude/api-and-data-retention)
+- [Anthropic — Data residency](https://platform.claude.com/docs/en/manage-claude/data-residency)
 - [Anthropic — Enterprise Frontier Safeguards](https://www.anthropic.com/news/enterprise-frontier-safeguards)
 - [xAI — API Security and Zero Data Retention](https://docs.x.ai/developers/faq/security)
 - [xAI — Data Processing Addendum](https://x.ai/legal/data-processing-addendum)

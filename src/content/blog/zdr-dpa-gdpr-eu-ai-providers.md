@@ -15,7 +15,7 @@ Prvou otázkou nie je, ktorý framework alebo cloud je najlepší. Prvou otázko
 
 ## Čo audit robí a čo nie
 
-Audit bol spravený k **31. 8. 2026**. Ide o časový snímok dôkazov, nie o trvalú záruku ani o právne poradenstvo. Primárne porovnáva komerčne použiteľné hostované inference API prevádzkované právnou entitou v EÚ, ktoré ponúkajú overené spracovanie v EÚ. xAI a Kimi sú doplnené ako porovnávacie profily mimo tejto úzkej európskej časti.
+Audit bol spravený k **31. 8. 2026**. Ide o časový snímok dôkazov, nie o trvalú záruku ani o právne poradenstvo. Primárne porovnáva komerčne použiteľné hostované inference API prevádzkované právnou entitou v EÚ, ktoré ponúkajú overené spracovanie v EÚ. Anthropic, xAI a Kimi sú doplnené ako porovnávacie profily mimo tejto úzkej európskej časti.
 
 Tvrdenia a dokumentácia, ktoré sa zmenili po 31. auguste 2026, sú uvedené ako aktualizácia stavu k **24. 9. 2026**. ZDR, konkrétne endpointy a regionálne možnosti sa môžu meniť, preto je rozhodujúca vždy aktuálna dokumentácia a konkrétna konfigurácia účtu.
 
@@ -63,7 +63,7 @@ Bez overiteľného dôkazu je „ZDR“ len tvrdenie.
 
 ## Výsledky auditu
 
-Táto tabuľka je doplnená o overený stav DPA tam, kde je možné ho doložiť. `Dokumentované` znamená výslovný dôkaz v verejnej dokumentácii poskytovateľa; nejde o nezávislé overenie prevádzky klienta ani o právny certifikát. `Dokumentované po schválení alebo zapnutí` vyžaduje ďalší krok na strane zákazníka. `Nespĺňa prísne kritérium` znamená, že dokumentovaná výnimka alebo retencia je mimo ZDR definovaného v tejto tabuľke. `Nepreukázané` znamená, že verejný zdroj nepotvrdil daný bod.
+Táto tabuľka je doplnená o overený stav DPA tam, kde je možné ho doložiť. `Dokumentované` znamená výslovný dôkaz vo verejnej dokumentácii poskytovateľa; nejde o nezávislé overenie prevádzky klienta ani o právny certifikát. `Dokumentované po schválení alebo zapnutí` vyžaduje ďalší krok na strane zákazníka. `Nespĺňa prísne kritérium` znamená, že dokumentovaná výnimka alebo retencia je mimo ZDR definovaného v tejto tabuľke. `Nepreukázané` znamená, že verejný zdroj nepotvrdil daný bod.
 
 | Poskytovateľ | Miesto inferencie a uloženia | Verdikt ZDR | DPA a dôkaz | Rozsah a výnimky |
 |---|---|---|---|---|
@@ -72,8 +72,8 @@ Táto tabuľka je doplnená o overený stav DPA tam, kde je možné ho doložiť
 | **IONOS Cloud / IONOS SE** | Nemecké dátové centrá; stateless Model Hub | **Dokumentované pre stateless Model Hub** | [DPA](https://www.ionos.co.uk/terms-gtc/data-processing-agreement); verejná dokumentácia | Prompty a výstupy sa podľa aktuálnej dokumentácie nezapisujú do trvalej úložnej infraštruktúry ani po dokončení requestu; zostávajú prevádzkové metadá. |
 | **Scaleway SAS** | Paris, Francúzsko | **Nespĺňa prísne kritérium** | [Verejný DPA](https://www-uploads.scaleway.com/DPA_2024_ENG_b0abb5cc26.pdf) a Generative APIs Privacy Policy | V bežnej prevádzke sa správa takmer ako ZDR, ale pri chybách alebo podozrenom zneužití môže zostať HTTP request až dva týždne; anonymné metadá sa môžu uchovávať šesť mesiacov. |
 | **Nebius Token Factory / Nebius B.V.** | verejné endpointy bez všeobecnej regionálnej garancie; dedicated endpoint má zmluvný región | **Dokumentované po zapnutí** | [Verejný DPA](https://docs.tokenfactory.nebius.com/legal/dpa) a verejná dokumentácia | Predvolene ukladá prompty a výstupy pre speculative decoding. ZDR ich vypne; Fínsko pri ukladaní je údaj o úložisku, nie dôkaz miesta inferencie. |
-| **Mistral AI** | `api.eu.mistral.ai`; EÚ a EFTA; control plane nie je regionálny | **Dokumentované po schválení** | [DPA/ZDR](https://docs.mistral.ai/admin/monitor-comply/zero-data-retention) a regionálna [dokumentácia](https://docs.mistral.ai/inference/regional-inference) | Platí pre podporované stateless API pri `pay-as-you-go` a schválení. Nevzťahuje sa na Labs modely ani stateful produkty, ako sú Agents, Batch, Conversations, Libraries, Files a Vibe Work. |
-| **OpenAI API / OpenAI Ireland Ltd.** | **Europe (EEA + Switzerland)** cez `eu.api.openai.com` | **Dokumentované po schválení** | [DPA](https://openai.com/policies/feb-2024-data-processing-addendum) a retention amendment | ZDR sa vzťahuje len na podporované endpointy a modely; systémové metadáta a niektoré funkcie sú mimo ZDR. Konkrétny endpoint a feature treba overiť v aktuálnej tabuľke ZDR. |
+| **Mistral AI** | `api.eu.mistral.ai`; EÚ a EFTA; control plane nie je regionálny | **Dokumentované po schválení** | [ZDR](https://docs.mistral.ai/admin/monitor-comply/zero-data-retention) a regionálna [dokumentácia](https://docs.mistral.ai/inference/regional-inference) | Platí pre podporované stateless API pri `pay-as-you-go` a schválení. Nevzťahuje sa na Labs modely ani stateful produkty, ako sú Agents, Batch, Conversations, Libraries, Files a Vibe Work. |
+| **OpenAI API / OpenAI Ireland Ltd.** | **Europe (EEA + Switzerland)** cez `eu.api.openai.com` | **Dokumentované po schválení** | [DPA](https://openai.com/policies/data-processing-addendum/) a retention amendment | ZDR sa vzťahuje len na podporované endpointy a modely; systémové metadáta a niektoré funkcie sú mimo ZDR. Konkrétny endpoint a feature treba overiť v aktuálnej tabuľke ZDR. |
 | **Anthropic / Anthropic Ireland Limited** | Priamy Claude API: v citovanej dokumentácii nie je doložená EÚ inferencia; regionálna cesta cez partnera je osobitný produkt | **Dokumentované po schválení** | [DPA](https://www.anthropic.com/legal/data-processing-addendum) a regionálna [dokumentácia](https://platform.claude.com/docs/en/manage-claude/data-residency) | Fable 5, Fable 5.1, Mythos 5 a Mythos 5.1 majú 30-dňovú retenciu. Pri označených chat/session vstupoch a výstupoch môže byť ich obsah uložený až dva roky aj pri ZDR. EFS je postupne dostupná architektúra. |
 | **xAI / xAI Corp** | predvolený global endpoint nezaručuje región; existuje samostatný US endpoint | **Dokumentované po zapnutí** | [Verejný xAI DPA](https://x.ai/legal/data-processing-addendum) | ZDR je self-serve na úrovni celého teamu. Predvolene sa API requesty a odpovede uchovávajú 30 dní; ZDR túto retenciu vypne a blokuje stateful Responses, Files, Collections, Batch, Deferred completions a uložené image/video výstupy. |
 | **Kimi / Moonshot AI PTE. LTD.** | Citovaný ZDR dokument neurčuje oblasť spracovania | **Dokumentované po schválení; rozsah obmedzený** | DPA nebola overená v citovaných zdrojoch | Enterprise ZDR na požiadanie: prompty a odpovede sa mažú po dokončení requestu a enterprise dáta sa netrénujú. Priame nahrávanie obrázkov/videa, tretie-party konektory a prevádzkové dáta sú mimo ZDR. |
@@ -114,7 +114,7 @@ Anthropic tiež uvádza, že pri označení obsahu systémom môžu jeho chat al
 
 Pri veľkých čínskych modeloch sa nedá odpovedať jednou spoločnou známkou:
 
-- **Kimi / Moonshot AI** publikuje ZDR pre enterprise zákazníkov na požiadanie a nezadržiava prompty ani odpovede po dokončení requestu. Dokumentácia neuvádza oblasť spracovania a nezahŕňa priame nahrávanie obrázkov alebo videí, tretie-party konektory ani prevádzkové logy. V tejto kontrole bol citovaný zdroj overený iba podľa dostupnej dokumentácie, nie nezávisle znovu načítaný; rozsah preto zaznamenávam ako obmedzený, nie ako potvrdené ZDR.
+- **Kimi / Moonshot AI** publikuje ZDR pre enterprise zákazníkov na požiadanie a nezadržiava prompty ani odpovede po dokončení requestu. Dokumentácia neuvádza oblasť spracovania a nezahŕňa priame nahrávanie obrázkov alebo videí, tretie-party konektory ani prevádzkové logy. DPA a oblasť spracovania nie sú v citovaných zdrojoch preukázané.
 - **DeepSeek** politika uvádza spracovanie v Číne pre vlastné služby DeepSeek a môže uchovávať údaje počas existencie účtu. Politika zároveň nevyjasňuje spracovanie údajov zákazníkov odovzdaných cez API. V našom audite preto používame stav `unproven`, nie definitívny FAIL. Vypnutie používania dát na zlepšovanie modelu, ak je k dispozícii, nie je ZDR.
 - **Qwen cez Alibaba Cloud Model Studio** deklaruje, že zákaznícke dáta nepoužíva na tréning a šifruje ich AES-256. Dokumentácia zároveň uvádza, že Model Studio ukladá dáta generované modelom a aplikáciou. Frankfurt endpoint a spracovanie všetkých operácií v EÚ vyžadujú samostatný zdroj; bez neho je európska rezidencia nepreukázaná.
 - **MiniMax** pri tejto kontrole som nenašiel dostatok oficiálnych verejných dôkazov pre jednotnú ZDR, DPA a regionálne spracovanie. Nedostatok dôkazu znamená v audite stav `nedokázané`, nie potvrdené ZDR.
@@ -144,7 +144,7 @@ V tomto audite je najdôležitejšia jedna veta: **ZDR nie je všeobecná vlastn
 
 ## Zdroje
 
-Zdroje boli overené k 24. 9. 2026. ZDR a regionálne možnosti sa môžu meniť, preto je potrebné pri produkčnom použití overiť aktuálnu dokumentciu a konkrétny účet.
+Zdroje boli overené k 24. 9. 2026. ZDR a regionálne možnosti sa môžu meniť, preto je potrebné pri produkčnom použití overiť aktuálnu dokumentáciu a konkrétny účet.
 
 - [OVHcloud — AI Endpoints: Getting started](https://docs.ovhcloud.com/en/guides/public-cloud/ai-machine-learning/ai-endpoints-getting-started)
 - [OVHcloud — Data Processing Agreement](https://us.ovhcloud.com/legal/data-processing-agreement)
@@ -161,7 +161,7 @@ Zdroje boli overené k 24. 9. 2026. ZDR a regionálne možnosti sa môžu meniť
 - [Mistral — ZDR Help Center](https://help.mistral.ai/en/articles/347612-can-i-activate-zero-data-retention-zdr)
 - [Mistral — Regional inference](https://docs.mistral.ai/inference/regional-inference)
 - [OpenAI — Offering Zero Data Retention for frontier models](https://openai.com/index/offering-zero-data-retention-for-frontier-models/)
-- [OpenAI — Data Processing Addendum](https://openai.com/policies/feb-2024-data-processing-addendum)
+- [OpenAI — Data Processing Addendum](https://openai.com/policies/data-processing-addendum/)
 - [OpenAI — Data controls in the OpenAI platform](https://developers.openai.com/api/docs/guides/your-data)
 - [OpenAI — Introducing data residency in Europe](https://openai.com/index/introducing-data-residency-in-europe/)
 - [Anthropic — API and data retention](https://platform.claude.com/docs/en/manage-claude/api-and-data-retention)

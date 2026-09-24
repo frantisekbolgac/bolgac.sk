@@ -4,7 +4,7 @@ name: Deploy
 # Git je zdroj pravdy; push je signál, že sa pravda zmenila.
 on:
   push:
-    branches: [main]
+    branches: [staging, main]
 
 jobs:
   deploy:
@@ -46,4 +46,5 @@ jobs:
           # nie stratená doména či mailbox. Blast radius sa reže vopred.
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "4"
+          wranglerVersion: "4.137.0"
+          command: ${{ github.ref_name == 'main' && 'deploy --env production' || 'deploy --env staging' }}

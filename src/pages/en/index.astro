@@ -1,22 +1,23 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+const posts = (await getCollection('blogEn', ({ data }) => !data.draft)).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 ---
 
 <BaseLayout
-	title="František Bolgac — technológie, AI a dátová suverenita"
-	description="Blog Františka Bolgaca o technologických riešeniach, AI a dátovej suverenite."
+	lang="en"
+	title="František Bolgac — technology, AI and data sovereignty"
+	description="František Bolgac's blog about technology, AI and data sovereignty."
 >
 	<section class="intro">
 		<p class="eyebrow">František Bolgac</p>
-		<h1>Technológie, AI a dátová suverenita.</h1>
+		<h1>Technology, AI and data sovereignty.</h1>
 		<p class="lead">
-			Píšem o technologických riešeniach, ktoré dávajú zmysel v praxi. Bez buzzwordov,
-			s dôrazom na dátovú suverenitu.
+			I write about technology that makes sense in practice. No buzzwords, with a focus on
+			data sovereignty.
 		</p>
 	</section>
 
@@ -26,14 +27,14 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 				posts.map((post) => (
 					<article class="post">
 						<time datetime={post.data.pubDate.toISOString()}>
-							{post.data.pubDate.toLocaleDateString('sk-SK')}
+							{post.data.pubDate.toLocaleDateString('en-GB')}
 						</time>
-						<h2><a href={`/blog/${post.id}/`}>{post.data.title}</a></h2>
+						<h2><a href={`/en/blog/${post.id}/`}>{post.data.title}</a></h2>
 						{post.data.description && <p>{post.data.description}</p>}
 						{post.data.tags.length > 0 && (
 							<div class="post-tags">
 								{post.data.tags.map((tag) => (
-									<a href={`/blog/tag/${tag}`}>#{tag}</a>
+									<a href={`/en/blog/tag/${tag}/`}>#{tag}</a>
 								))}
 							</div>
 						)}

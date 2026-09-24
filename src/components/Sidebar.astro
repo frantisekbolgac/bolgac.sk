@@ -1,26 +1,40 @@
 ---
 interface Props {
 	tags: string[];
+	lang?: 'sk' | 'en';
 }
 
-const { tags } = Astro.props;
+const { tags, lang = 'sk' } = Astro.props;
+const isEnglish = lang === 'en';
+const blogPrefix = isEnglish ? '/en' : '';
+const bioTitle = isEnglish ? 'Technology, AI and data sovereignty.' : 'Technológie, AI a dátová suverenita.';
+const bio = isEnglish
+	? 'First, data — its identification and classification, private and public. I always start system design from that; everything else is composition, using what exists or building it when needed.'
+	: 'Najprv dáta — ich identifikácia a klasifikácia, súkromné a verejné. Z nich pri návrhu systému vždy vychádzam; zvyšok je už skladanie existujúcich dielov, alebo stavba vlastných.';
 ---
 
 <aside class="sidebar">
 	<div class="profile">
-		<div class="avatar" aria-hidden="true">FB</div>
+		<img
+			class="avatar"
+			src="/frantisek-web.jpg"
+			alt="František Bolgac"
+			width="108"
+			height="108"
+		/>
 		<p class="name">František Bolgac</p>
-		<p class="bio">AI pre právne kancelárie. Dáta first — podľa dát vyberám nástroje a level bezpečnosti.</p>
+		<p class="bio-title">{bioTitle}</p>
+		<p class="bio">{bio}</p>
 	</div>
 
 	{
 		tags.length > 0 && (
 			<div class="tags">
-				<p class="tags-title">Tagy</p>
+				<p class="tags-title">{isEnglish ? 'Topics' : 'Tagy'}</p>
 				<ul>
 					{tags.map((tag) => (
 						<li>
-							<a href={`/blog/tag/${tag}`}>#{tag}</a>
+							<a href={`${blogPrefix}/blog/tag/${tag}`}>#{tag}</a>
 						</li>
 					))}
 				</ul>
@@ -36,22 +50,23 @@ const { tags } = Astro.props;
 		gap: 2rem;
 	}
 	.avatar {
-		width: 4.5rem;
-		height: 4.5rem;
+		display: block;
+		width: 6.75rem;
+		height: 6.75rem;
 		border-radius: 50%;
-		background: var(--accent);
-		color: var(--bg);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 700;
-		font-size: 1.5rem;
-		margin-bottom: 1rem;
+		object-fit: cover;
+		margin: 0 auto 1rem;
 	}
 	.name {
 		font-weight: 700;
 		font-size: 1.125rem;
 		margin: 0 0 0.5rem;
+	}
+	.bio-title {
+		margin: 0 0 0.5rem;
+		color: var(--text);
+		font-size: 0.9rem;
+		font-weight: 600;
 	}
 	.bio {
 		margin: 0;

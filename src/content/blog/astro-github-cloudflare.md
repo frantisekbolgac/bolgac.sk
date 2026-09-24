@@ -1,6 +1,6 @@
 ---
-title: "Astro + GitHub + Cloudflare: blog bez servera"
-description: "Ako som poskladal osobný blog: Obsidian ako editor, GitHub ako CI a Cloudflare ako hosting. Žiadny server, žiadny CMS."
+title: "Jednoduchá architektúra osobného blogu"
+description: "Prečo som Obsidian, GitHub, Astro a Cloudflare poskladal ako jednu jednoduchú pipeline: obsah ide cez jednu hranicu a web zostáva statický."
 pubDate: 2026-09-19
 tags:
   - astro
@@ -8,40 +8,80 @@ tags:
   - github
 ---
 
-Rozhodol som sa postaviť si osobný blog tak, aby som ho vedel písať z Obsidianu a nemusel sa starať o žiadny server. Výsledok je trojica, kde má každá časť presne jednu úlohu.
+Pri blogu sa dá ľahko začať otázkou, aký CMS použiť. Pre mňa bola dôležitejšia iná otázka: **čo je zdroj pravdy, kto zodpovedá za build a kde sa výsledok dostane na internet?**
 
-## Architektúra
+Odpoveďou je jedna jednoduchá pipeline. Obsah vzniká v Obsidiane, prechádza cez Git, Astro z neho vytvorí statický web a Cloudflare ho doručí návštevníkom. Každá časť má vlastnú zodpovednosť a žiadna nemusí vedieť veľa o ostatných.
 
-- **Obsidian** — editor. Články sú obyčajné `.md` súbory s frontmatterom (`title`, `pubDate`, `tags`). Žiadne CMS rozhranie, žiadne kopírovanie do webu.
-- **GitHub** — zdroj pravdy a CI. Push spustí GitHub Actions: `npm ci`, `astro build` a validácia frontmatteru. Ak je v článku chyba, build zlyhá a na web sa nedostane nič.
-- **Cloudflare** — hosting. Hotový priečinok `dist/` sa nasadí ako assets-only worker. Žiadny bežiaci server, len statické súbory na edge.
+## Východiská
+
+Architektúra vychádza zo štyroch požiadaviek:
+
+- články musím vedieť písať v bežnom lokálnom editore,
+- každá zmena má mať svoju verziu a môcť sa vrátiť späť,
+- publikovanie nesmie vyžadovať správu o bežiacom serveri,
+- výsledný web má zostať jednoduchý na hosťovanie a čítanie.
+
+CMS by bol možný, ale pre osobný blog by pribudol ďalší systém, ďalšie používateľské rozhranie a ďalšie miesto, kde sa môže obsah pokaziť. Databáza a aplikačný server by pridali prevádzku, ktorú tu nepotrebujem.
+
+Dôležité je teda nie to, že používam konkrétny framework, ale to, že každý krok má jasnú hranicu.
+
+## Jedna zodpovednosť pre každú vrstvu
 
 ```
-Obsidian (.md) → git push → GitHub Actions (build + validácia) → Cloudflare (statika)
+Obsidian (.md)
+    ↓
+GitHub (verzie + CI)
+    ↓
+Astro (build + statické súbory)
+    ↓
+Cloudflare (CDN + TLS)
 ```
 
-## Prečo nie hotová téma
+- **Obsidian je pracovný priestor pre obsah.** Článok je bežný Markdown súbor s frontmatterom. Nie je len export do iného systému, ale zdroj, ktorý môžem commitnúť, upraviť a porovnať.
+- **GitHub je zdroj pravdy a miesto validácie.** Git uchováva historianku, GitHub Actions z čistého stavu nainštaluje závislosti a Astro build zastaví, ak je frontmatter alebo štruktúra obsahu chybná.
+- **Astro je kompilačná hranica.** Z Markdownu a šablón vytvorí konkrétne stránky, sitemap trás a ďalšie výstupné súbory. Astro nepotrebuje bežať ako aplikácia, aby bol web dostupný.
+- **Cloudflare je distribúcia.** Nasadí hotový priečinok `dist/` ako statické súbory a zabezpečí ich doručovanie cez CDN a TLS.
 
-Zvažoval som Quartz aj niekoľko Astro tém (Chirping, Fuwari, AstroPaper). Každá bola buď príliš ťažká, alebo cudzia — kód, ktorému nerozumiem, je kód, ktorý neviem opraviť. Tak som si šablónu napísal sám: sidebar, navy paleta, light/dark režim, nula závislostí nad rámec Astra.
+Hranica je dôležitá: **GitHub nenasadzuje ľubovoľné súbory a Cloudflare nepreberá zodpovednosť za chybný build.** Najprv prebehne validácia, až potom sa výstroj dostane na verejnosť.
 
-Priznanie: šablónu som **vibe-codil** s AI asistentom. Infraštruktúru (Git, DNS, pipeline) som si staval rukami a rozumiem každému kroku — pri šablóne som AI nechal generovať a ja som revidoval, pýtal sa na princípy a rozhodoval o looku. Výsledok je kód, ktorému rozumiem, len cesta k nemu bola rýchlejšia.
+## Prečo statický výstup
 
-Výhoda vlastnej šablóny: presne viem, čo sa pri builde stane s každým riadkom. Nevýhoda: všetko si musím postaviť sám. Pre blog je to pár večerov — prijateľná cena za porozumenie.
+Najväčšie zjednodušenie nie je samotný Astro, ale to, že výsledkom je súborová štruktúra, nie bežiaca aplikácia.
 
-## Z čoho je to postavené
+To prináša niekoľko výhod:
 
-Päť stavebných blokov, každý s jednou úlohou:
+- web nemá serverový proces, ktorý treba patchovať a monitorovať,
+- výstup je možné skontrolovať ešte pred publikovaním,
+- každá zmena je verzovaná a reverzibilná,
+- doručovanie vie prevziať CDN a cache,
+- hosting škáluje jednoduchšie než aplikácia s databázou.
 
-**1. OpenCode** — open-source coding harness bežiaci v termináli. Držal kontext projektu, editoval súbory, púšťal buildy a git operácie. Ja som zadával smer a revidoval výsledky — AI písalo, človek rozhodoval.
+Výmena je rovnako dôležitá. Každá nová zmena vyžaduje commit a build. Nie je tu redakčné rozhranie, ktorým by som článok zmenil priamo v prehliadači, ani databáza, v ktorej by sa hľadali dáta pri každej požiadavke.
 
-**2. Muse Spark 1.3** — jazykový model pripojený do OpenCode. Na základe mojich požiadaviek (konzervatívny look, sidebar, navy paleta, light/dark) spolu vygenerovali tému pre Astro 7. Infraštruktúru som si robil sám, šablóna je vibe-coding.
+Pre osobný blog je to prijateľný kompromis. Frekvencia zmien je nízka a jednotlivé verzie sú lacné na vytvorenie aj opravu.
 
-**3. Astro + Node lokálne** — Node 22 a `astro dev` server s hot-reloadom na porte 8002. Tu sa ladil vzhľad a kontrolovala responzivita skôr, než čokoľvek odišlo von. Build trvá pod dve sekundy, takže cyklus nápad → náhľad je okamžitý.
+## Vlastná šablóna nie je len dizajn
 
-**4. GitHub** — úložisko zdrojákov a CI v jednom. Každý push do `main` spustí GitHub Actions: čistá inštalácia (`npm ci`), `astro build` vrátane validácie frontmatteru a deploy. Zlý frontmatter = červený build = nič sa nepublikuje.
+Hotová téma by bola úplne rozumná. Vlastnú šablónu som si nechal preto, že pri takom malom projekte je každá zbytočná závislosť ďalšia vec, ktorú treba spravovať.
 
-**5. Cloudflare Workers** — "úložisko aj webserver" v jednom. Hotová statika (`dist/`) sa nasadí ako assets-only worker a servuje sa z edge po celom svete. DNS, TLS certifikát a CDN sú vedľajší produkt toho istého účtu, kde mám aj doménu.
+Sidebar, jednoduchá paleta a light/dark režim nie sú dôvodom architektúry. Dôvodom je, že celý tok zostáva čitateľný: viem, kde sa obsah vytvára, kde sa validuje, čo sa nasádza a čo hostiteľ iba doručuje.
 
-## Čo bude ďalej
+Šablónu som nechal vygenerovať AI agentmi.
 
-RSS a sitemap, vlastná doména namiesto `workers.dev`, vyhľadávanie cez Pagefind a napojenie Obsidianu tak, aby články putovali do repa bez ručného kopírovania. O každom kroku napíšem sem.
+## Obsah a jazyk
+
+Obsah píšem po slovensky. AI pomáha s korektúrou, formuláciou a prekladom do angličtiny. Tému, rozhodnutia a architektonické postoje však ponechávam vo svojich rukách.
+
+## Kde táto architektúra prestane stačiť
+
+Toto riešenie nie je univerzálne. Pri viacerých autoroch by sa mohla objaviť potreba CMS, ktoré rieši role, náhľady a workflow. Pri komentároch, autentifikácii alebo personalizovanom obsahu by už bolo potrebné doplniť databázu a backend.
+
+Aj vtedy by som najprv hľadal samostatnú hranicu, ktorú možno pridať bez prepísania celého systému. RSS, sitemap alebo vyhľadávanie môžu byť rozšíreniami tejto architektúry. Komplexnejší backend už znamená nový problém s prevádzkou, ukladaním dát a zodpovednosťou.
+
+Z hľadiska dátovej suverenity má táto pipeline jednu dôležitú vlastnosť: obsah zostáva v čitateľných Markdown súboroch pod mojím vlastným riadením. Git uchováva jeho verziu, build ho transformuje a Cloudflare dostáva až výsledný artefakt. Hosting teda nie je zdrojom pravdy pre obsah.
+
+## Záver
+
+Hodnota tejto architektúry nie je v tom, že má najmenej nástrojov. V tom, že má jasné zodpovednosti, overiteľný build a jednoduchú hranicu medzi autorstvom, distribúciou a publikovaním.
+
+Pre tento rozsah je to správna výmena: menej runtime zložitosti, viac kontroly nad obsahom a možnosť kedykoľvek jednotlivé časti nahradiť.

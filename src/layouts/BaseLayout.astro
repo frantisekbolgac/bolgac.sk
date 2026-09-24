@@ -5,25 +5,61 @@ import { getCollection } from 'astro:content';
 interface Props {
 	title: string;
 	description?: string;
+	lang?: 'sk' | 'en';
 }
 
-const { title, description = 'Bolgac — blog' } = Astro.props;
+const { title, description = 'Bolgac — blog', lang = 'sk' } = Astro.props;
 const path = Astro.url.pathname;
+const isEnglish = lang === 'en';
+const homePath = isEnglish ? '/en/' : '/';
+const blogPath = isEnglish ? '/en/blog/' : '/blog/';
+const aboutPath = isEnglish ? '/en/about/' : '/o-mne/';
+const isHome = isEnglish ? path === '/en/' || path === '/en' : path === '/';
 
-// Tagy pre sidebar: zozbierame zo všetkých publikovaných postov.
-// Beží pri builde, takže sidebar je vždy aktuálny bez ručnej údržby.
-const posts = await getCollection('blog', ({ data }) => !data.draft);
-const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+function withTrailingSlash(pathname: string) {
+	return pathname.endsWith('/') ? pathname : `${pathname}/`;
+}
+
+function toLanguagePath(pathname: string, language: 'sk' | 'en') {
+	const normalized = pathname === '' ? '/' : pathname;
+
+	if (language === 'en') {
+		if (normalized === '/') return '/en/';
+		if (normalized === '/o-mne' || normalized === '/o-mne/') return '/en/about/';
+		return withTrailingSlash(`/en${normalized.startsWith('/en') ? normalized.slice(3) : normalized}`);
+	}
+
+	if (normalized === '/en' || normalized === '/en/') return '/';
+	if (normalized === '/en/about' || normalized === '/en/about/') return '/o-mne/';
+	return withTrailingSlash(normalized.replace(/^\/en/, ''));
+}
+
+const siteUrl = Astro.site ?? Astro.url;
+const canonicalUrl = new URL(withTrailingSlash(path), siteUrl);
+const skUrl = new URL(toLanguagePath(path, 'sk'), siteUrl);
+const enUrl = new URL(toLanguagePath(path, 'en'), siteUrl);
+const languagePath = toLanguagePath(path, isEnglish ? 'sk' : 'en');
+const languageLabel = isEnglish ? 'Switch to Slovak' : 'Switch to English';
+const languageHreflang = isEnglish ? 'sk' : 'en';
+
+const posts = isEnglish
+	? await getCollection('blogEn', ({ data }) => !data.draft)
+	: await getCollection('blog', ({ data }) => !data.draft);
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 ---
 
 <!doctype html>
-<html lang="sk">
+<html lang={lang}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<link rel="canonical" href={canonicalUrl} />
+		<link rel="alternate" hreflang="sk" href={skUrl} />
+		<link rel="alternate" hreflang="en" href={enUrl} />
+		<link rel="alternate" hreflang="x-default" href={skUrl} />
 		<script is:inline>
 			// No-FOUC: téma sa aplikuje skôr, než sa vykreslí čokoľvek.
 			// Preto inline v <head>, nie externý súbor (ten by prišiel neskoro
@@ -83,6 +119,8 @@ const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
 				display: flex;
 				align-items: center;
 				gap: 1.5rem;
+				flex-wrap: wrap;
+				row-gap: 0.5rem;
 			}
 			.brand {
 				font-weight: 700;
@@ -92,6 +130,7 @@ const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
 			.topnav {
 				display: flex;
 				gap: 1.25rem;
+				flex-wrap: wrap;
 			}
 			.topnav a {
 				color: var(--muted);
@@ -104,8 +143,21 @@ const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
 				color: var(--accent);
 				font-weight: 600;
 			}
-			.theme-toggle {
+			.controls {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
 				margin-left: auto;
+			}
+			.language-link {
+				color: var(--muted);
+				font-size: 0.85rem;
+				text-decoration: none;
+			}
+			.language-link:hover {
+				color: var(--accent);
+			}
+			.theme-toggle {
 				background: none;
 				border: 1px solid var(--border);
 				border-radius: 0.375rem;
@@ -171,23 +223,59 @@ const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
 				padding: 0.125rem 0.375rem;
 				font-size: 0.9em;
 			}
+			:global(table) {
+				display: block;
+				width: 100%;
+				margin: 1.5rem 0;
+				border-collapse: collapse;
+				border-top: 1px solid color-mix(in srgb, var(--muted) 50%, var(--border));
+				overflow-x: auto;
+			}
+			:global(th),
+			:global(td) {
+				padding: 0.75rem 0.625rem;
+				border-bottom: 1px solid color-mix(in srgb, var(--muted) 50%, var(--border));
+				text-align: left;
+				vertical-align: top;
+			}
+			:global(th) {
+				color: var(--muted);
+				font-size: 0.75rem;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+			}
 		</style>
 	</head>
 	<body>
 		<header class="topbar">
 			<div class="topbar-inner">
-				<a class="brand" href="/">bolgac.sk</a>
-				<nav class="topnav" aria-label="Hlavná navigácia">
-					<a href="/" class:list={[{ active: path === '/' }]}>Domov</a>
-					<a href="/blog" class:list={[{ active: path.startsWith('/blog') }]}>Blog</a>
+				<a class="brand" href={homePath}>bolgac.sk</a>
+				<nav class="topnav" aria-label={isEnglish ? 'Main navigation' : 'Hlavná navigácia'}>
+					<a href={homePath} class:list={[{ active: isHome }]}>{isEnglish ? 'Home' : 'Domov'}</a>
+					<a href={blogPath} class:list={[{ active: path.startsWith(isEnglish ? '/en/blog' : '/blog') }]}>Blog</a>
+					<a href={aboutPath} class:list={[{ active: path.startsWith(isEnglish ? '/en/about' : '/o-mne') }]}>
+						{isEnglish ? 'About' : 'O mne'}
+					</a>
 				</nav>
-				<button class="theme-toggle" id="theme-toggle" aria-label="Prepnúť tému">◐</button>
+				<div class="controls">
+					<a
+						class="language-link"
+						href={languagePath}
+						hreflang={languageHreflang}
+						aria-label={languageLabel}
+					>
+						{isEnglish ? 'SK' : 'EN'}
+					</a>
+					<button class="theme-toggle" id="theme-toggle" aria-label={isEnglish ? 'Toggle theme' : 'Prepnúť tému'}>◐</button>
+				</div>
+
 			</div>
 		</header>
 		<div class="container">
 			<div class="layout">
 				<div class="sidebar-wrap">
-					<Sidebar tags={tags} />
+					<Sidebar tags={tags} lang={lang} />
 				</div>
 				<main>
 					<slot />

@@ -1,6 +1,7 @@
 ---
 title: "ZDR, DPA a GDPR pri výbere európskych poskytovateľov AI"
 description: "Ako rozlišujem technické garancie, zmluvné pokrytie a dôkazy pri výbere inference poskytovateľa pre citlivé dáta."
+image: "/blog/ZDR-DPA-GDPR-poskytovatelia-AI/zdr-dpa-gdpr-sk.jpg"
 pubDate: 2026-09-24
 tags:
   - ai

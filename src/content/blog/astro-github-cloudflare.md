@@ -1,6 +1,7 @@
 ---
 title: "Jednoduchá architektúra osobného blogu"
 description: "Prečo som Obsidian, GitHub, Astro a Cloudflare poskladal ako jednu jednoduchú pipeline: obsah ide cez jednu hranicu a web zostáva statický."
+image: "/blog/blog-architektura/blog-architektura-sk.jpg"
 pubDate: 2026-09-19
 tags:
   - astro

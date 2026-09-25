@@ -69,7 +69,8 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 		<meta property="og:locale" content={locale} />
 		<meta property="og:locale:alternate" content={alternateLocale} />
 		{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+		{ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<link rel="canonical" href={canonicalUrl} />

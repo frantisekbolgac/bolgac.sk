@@ -36,6 +36,39 @@ jobs:
       #    dist/ je v .gitignore: čo vieš reprodukovať, to neskladuješ.
       - run: npm run build
 
+      - name: Verify sitemap
+        run: |
+          test -s dist/sitemap-index.xml
+          test -s dist/sitemap-0.xml
+          python3 -c "import xml.etree.ElementTree as ET; ET.parse('dist/sitemap-index.xml'); ET.parse('dist/sitemap-0.xml')"
+          node --input-type=module <<'EOF'
+          import { existsSync, readFileSync } from 'node:fs';
+
+          const index = readFileSync('dist/sitemap-index.xml', 'utf8');
+          const sitemap = readFileSync('dist/sitemap-0.xml', 'utf8');
+          const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+
+          if (!index.includes('<loc>https://bolgac.sk/sitemap-0.xml</loc>')) {
+            throw new Error('Sitemap index does not reference the generated sitemap');
+          }
+          if (urls.length === 0 || !urls.includes('https://bolgac.sk/blog/') || !urls.includes('https://bolgac.sk/en/blog/')) {
+            throw new Error('Sitemap is missing a public Slovak or English page');
+          }
+          if (urls.some((url) => !url.startsWith('https://bolgac.sk/') || url.includes('workers.dev'))) {
+            throw new Error('Sitemap contains a non-production URL');
+          }
+          for (const url of urls) {
+            const pathname = new URL(url).pathname;
+            const file = pathname === '/' ? 'dist/index.html' : `dist${pathname}index.html`;
+            if (!existsSync(file)) {
+              throw new Error(`Sitemap URL does not have a generated page: ${url}`);
+            }
+          }
+          if (!readFileSync('dist/robots.txt', 'utf8').includes('Sitemap: https://bolgac.sk/sitemap-index.xml')) {
+            throw new Error('robots.txt does not advertise the sitemap index');
+          }
+          EOF
+
       # 5. DEPLOY. Cieľ nie je tu — je vo wrangler.jsonc.
       #    YAML dodáva len credentials; čo a kam sa posiela, vie wrangler.
       #    Oddelenie: CI vie "kedy", konfigurák vie "čo".

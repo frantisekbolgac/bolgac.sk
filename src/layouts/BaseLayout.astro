@@ -7,9 +7,10 @@ interface Props {
 	description?: string;
 	lang?: 'sk' | 'en';
 	ogType?: 'website' | 'article';
+	image?: string;
 }
 
-const { title, description = 'Bolgac — blog', lang = 'sk', ogType = 'website' } = Astro.props;
+const { title, description = 'Bolgac — blog', lang = 'sk', ogType = 'website', image } = Astro.props;
 const path = Astro.url.pathname;
 const isEnglish = lang === 'en';
 const homePath = isEnglish ? '/en/' : '/';
@@ -37,6 +38,7 @@ function toLanguagePath(pathname: string, language: 'sk' | 'en') {
 
 const siteUrl = Astro.site ?? Astro.url;
 const canonicalUrl = new URL(withTrailingSlash(path), siteUrl);
+const ogImageUrl = image ? new URL(image, siteUrl) : undefined;
 const skUrl = new URL(toLanguagePath(path, 'sk'), siteUrl);
 const enUrl = new URL(toLanguagePath(path, 'en'), siteUrl);
 const locale = isEnglish ? 'en_US' : 'sk_SK';
@@ -66,6 +68,7 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 		<meta property="og:site_name" content="bolgac.sk" />
 		<meta property="og:locale" content={locale} />
 		<meta property="og:locale:alternate" content={alternateLocale} />
+		{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
 		<meta name="twitter:card" content="summary" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />

@@ -1,6 +1,7 @@
 ---
 title: "ZDR, DPA and GDPR when choosing European AI providers"
 description: "How I separate technical guarantees, contractual coverage and evidence when choosing an inference provider for sensitive data."
+image: "/blog/ZDR-DPA-GDPR-poskytovatelia-AI/zdr-dpa-gdpr-en.jpg"
 pubDate: 2026-09-24
 tags:
   - ai

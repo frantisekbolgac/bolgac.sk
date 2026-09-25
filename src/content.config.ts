@@ -4,6 +4,7 @@ import { glob } from 'astro/loaders';
 const blogSchema = z.object({
 	title: z.string(),
 	description: z.string().optional(),
+	image: z.string().optional(),
 	pubDate: z.coerce.date(),
 	draft: z.boolean().default(false),
 	tags: z.array(z.string()).default([]),

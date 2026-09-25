@@ -1,6 +1,7 @@
 ---
 title: "A simple architecture for a personal blog"
 description: "Why I combined Obsidian, GitHub, Astro and Cloudflare into one simple pipeline: content crosses one boundary and the web remains static."
+image: "/blog/blog-architektura/blog-architektura-en.jpg"
 pubDate: 2026-09-19
 tags:
   - astro

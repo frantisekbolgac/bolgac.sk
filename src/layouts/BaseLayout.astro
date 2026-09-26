@@ -10,7 +10,7 @@ interface Props {
 	image?: string;
 }
 
-const { title, description = 'Bolgac — blog', lang = 'sk', ogType = 'website', image } = Astro.props;
+const { title, description = 'František Bolgáč — blog', lang = 'sk', ogType = 'website', image } = Astro.props;
 const path = Astro.url.pathname;
 const isEnglish = lang === 'en';
 const homePath = isEnglish ? '/en/' : '/';

@@ -1,6 +1,7 @@
 ---
 title: "Your own server on someone else's computer: privacy and data protection on a VPS"
 description: "With a rented VPS, root access is only part of the story. How I distinguish technical access, contractual obligations and the copies that remain after a server is deleted."
+image: "/blog/vps-sukromie-ochrana-dat/vps-sukromie-ochrana-dat-en.jpg"
 pubDate: 2026-10-07
 tags:
   - vps

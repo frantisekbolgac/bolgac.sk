@@ -1,6 +1,7 @@
 ---
 title: "Vlastný server na cudzom počítači: súkromie a ochrana dát na VPS"
 description: "Pri prenajatom VPS je root iba časťou príbehu. Ako rozlišujem technický prístup, zmluvné záväzky a kópie, ktoré zostávajú po zmazaní servera."
+image: "/blog/vps-sukromie-ochrana-dat/vps-sukromie-ochrana-dat-sk.jpg"
 pubDate: 2026-10-07
 tags:
   - vps

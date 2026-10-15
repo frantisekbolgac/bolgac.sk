@@ -1,6 +1,6 @@
 ---
-title: "A simple architecture for a personal blog"
-description: "Why I combined Obsidian, GitHub, Astro and Cloudflare into one simple pipeline: content crosses one boundary and the web remains static."
+title: "How this blog is built: Obsidian, GitHub, Astro and Cloudflare"
+description: "Each article is a plain text file, the site is built automatically and no program runs on the server. Why, and where it stops being enough."
 image: "/blog/blog-architektura/blog-architektura-en.jpg"
 pubDate: 2026-09-19
 tags:
@@ -9,80 +9,70 @@ tags:
   - github
 ---
 
-It is easy to start a blog by asking which CMS to use. For me, a more important question was: **what is the source of truth, who is responsible for the build, and where does the result end up on the internet?**
+**TL;DR:** I write articles in Obsidian as plain text files. After I upload them to GitHub, a tool called Astro turns them into finished pages and Cloudflare delivers them to readers. No program and no database run on the website, so there is less to update and watch. The price: I can't edit an article in the browser, and there will be no comments or logins here. Putting it all together took about an hour, and running it costs €0.
 
-The answer is one simple pipeline. Content starts in Obsidian, passes through Git, Astro turns it into a static website, and Cloudflare delivers it to visitors. Each part has one responsibility and does not need to know much about the others.
+## The first question was not which CMS
 
-## Starting points
+The blog exists because I have partly returned to IT.
 
-The architecture follows four requirements:
+When starting a blog, people usually ask first which content management system (CMS, for example WordPress) to use. I was interested in three other things: where the texts will be stored, who builds the website from them, and where that website will run.
 
-- I need to be able to write articles in a regular local editor,
-- every change needs its own version and the ability to be rolled back,
-- publishing must not require maintaining a running server,
-- the resulting website should remain simple to host and read.
+I had four requirements:
 
-A CMS would be possible, but for a personal blog it would add another system, another user interface and another place where the content can break. A database and application server would add operations that I do not need here.
+- write in an ordinary editor on my own computer,
+- be able to undo any change,
+- not look after a server that runs a program,
+- a website that is easy to host and loads fast.
 
-The important point is therefore not which framework I use. It is that every step has a clear boundary.
+I know WordPress, and I don't think it is a good tool for this job. It is too big and full of things I don't need, starting with the database. I also considered Quartz, which builds a website directly from Obsidian notes, but I didn't like its look and its limited options.
 
-## One responsibility per layer
+## Four steps from a note to the website
 
 ```
-Obsidian (.md)
+Obsidian (text file .md)
     ↓
-GitHub (versions + CI)
+GitHub (versions + automatic check)
     ↓
-Astro (build + static files)
+Astro (text into finished pages)
     ↓
-Cloudflare (CDN + TLS)
+Cloudflare (delivery to readers)
 ```
 
-- **Obsidian is the workspace for content.** An article is a regular Markdown file with frontmatter. It is not an export into another system, but a source I can commit, edit and compare.
-- **GitHub is the source of truth and the validation point.** Git keeps the history, while GitHub Actions installs dependencies from a clean state and stops the Astro build if the frontmatter or content structure is invalid.
-- **Astro is the compilation boundary.** It turns Markdown and templates into concrete pages, route sitemaps and other output files. Astro does not need to run as an application for the website to be available.
-- **Cloudflare is distribution.** It deploys the generated `dist/` directory as static files and delivers them through a CDN with TLS.
+**Obsidian** is a note-taking app. An article there is an ordinary text file in Markdown format, stored on my disk. At the top of the file there are a few lines with the title, date and tags (called frontmatter). This file is the original, everything after it is produced from it.
 
-The boundary matters: **GitHub does not deploy arbitrary files, and Cloudflare does not take responsibility for a broken build.** Validation happens first, and only then does the artifact become public.
+**GitHub** keeps every version of the files. When I upload a change, GitHub Actions starts a fresh virtual machine, installs exactly the library versions recorded in the repository, and tries to build the website. If an article is missing a required field, for example the title or date, the build fails and nothing is published. It then also checks that the sitemap for search engines lists all pages and no test address.
 
-## Why static output
+**Astro** takes the text files and the template and produces finished HTML pages in the `dist/` folder. Besides Astro itself, the website needs only one library, for generating the sitemap.
 
-The biggest simplification is not Astro itself. It is that the result is a directory of files, not a running application.
+**Cloudflare** receives the finished folder and delivers it to readers from servers around the world, over an encrypted connection (https). The website runs on Cloudflare Workers in a mode where files are only served and no code is executed.
 
-This brings a few advantages:
+There are two websites. Every change goes to the test website first. When it is fine, I open a pull request on GitHub, a request to take the changes from the test branch `staging` into the main branch `main`. Once it is merged, GitHub Actions sends the new version to Cloudflare at bolgac.sk.
 
-- the website has no server process to patch and monitor,
-- the output can be reviewed before publication,
-- every change is versioned and reversible,
-- delivery can be handled by a CDN and cache,
-- hosting scales more easily than an application with a database.
+One more detail: the key GitHub uses to upload the website to Cloudflare is only allowed to overwrite this website. If it leaked, an attacker could overwrite the site, but could not get to the domain or e-mail.
 
-The trade-off is just as important. Every new change requires a commit and a build. There is no editorial interface where I edit an article directly in a browser, and there is no database queried on every request.
+## Why finished files and not an application
 
-For a personal blog, this is an acceptable trade-off. Changes are infrequent and each version is cheap to create and fix.
+Most of the simplification comes from the result being a folder of files, not a running program. That means:
 
-## A custom template is more than design
+- there is no server process to patch and monitor,
+- the result can be checked before it is published,
+- every change has its own version and can be undone,
+- Cloudflare handles delivery on its own, without my server.
 
-Using a ready-made theme would have been completely reasonable. I chose a custom template because, in a project this small, every unnecessary dependency is another thing to maintain.
+Every change, even fixing a typo, means uploading a new version and waiting for the build. There is no admin panel where I could edit text in the browser, and no database that assembles the page on every visit. For a blog that changes rarely, this does not bother me.
 
-The sidebar, simple palette and light/dark mode are not the reason for the architecture. The reason is that the entire flow remains understandable: I know where content is created, where it is validated, what is deployed and what the host only delivers.
+## The template and AI
 
-I had AI agents generate the template. That is an implementation method, not an architectural principle. The important part is that I can review and understand the result instead of adopting a foreign template and its dependencies without knowing their boundaries.
+A ready-made theme would have been a perfectly reasonable choice. My own template (sidebar, simple colours, light and dark mode) was generated by the GLM 5.3 Flash model in OpenCode. Putting everything together took about an hour, including the discussion about the template. I estimate the model tokens at under €2, and even that is probably too high. GitHub and Cloudflare cost me nothing for this blog. A foreign theme would bring its own dependencies that I would have to track without understanding them. What matters is that I understand the generated result and can review it.
 
-## Content and language
+I write in Slovak. AI helps me with proofreading, phrasing and translation into English. The topic, decisions and opinions stay mine.
 
-I write content in Slovak. AI helps with correction, phrasing and English translation. The topic, decisions and architectural views remain mine.
+## Where this stops being enough
 
-## Where this architecture stops being enough
+If I wanted to edit articles in the browser, for example for another author, I would not have to rebuild the blog. I would add Pages CMS: an open-source editing interface that changes files directly in the GitHub repository, without its own database. It is configured with one `.pages.yml` file in the repository, and its hosted app can be used, so there is nothing to host.
 
-This solution is not universal. With multiple authors, a CMS might be needed to handle roles, previews and workflow. Comments, authentication or personalised content would require adding a database and a backend.
+Comments, logins or content tailored to a specific reader would require a database and a server.
 
-Even then, I would first look for a separate boundary that can be added without rewriting the whole system. RSS, sitemaps or search can be extensions of this architecture. A more complex backend introduces a new set of problems around operations, data storage and responsibility.
+Smaller things can be added without rebuilding. The sitemap for search engines was added this way; RSS or search could be too. A full backend would be a new project, with its own operations and its own responsibility for data.
 
-From a data-sovereignty perspective, this pipeline has one important property: the content remains readable Markdown files under my own control. Git keeps its version, the build transforms it, and Cloudflare receives only the resulting artifact. Hosting is therefore not the source of truth for the content.
-
-## Conclusion
-
-The value of this architecture is not that it uses the fewest tools. It is that it has clear responsibilities, a verifiable build and a simple boundary between authorship, distribution and publishing.
-
-For this scope, it is the right trade-off: less runtime complexity, more control over the content and the ability to replace individual parts later.
+From a data-sovereignty point of view: the originals are readable text files on my disk and in my repository. Cloudflare receives only the finished result. If I want to change hosting, I deploy the same `dist/` folder somewhere else.
